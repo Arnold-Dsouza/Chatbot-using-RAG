@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chatbot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .chat-container {
+            max-width: 480px;
+            margin: 40px auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(60,72,100,0.18);
+            padding: 32px 24px 20px 24px;
+            backdrop-filter: blur(2px);
+        }
+        .chat-container h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+            color: #22223b;
+        }
+        .chat-log {
+            height: 340px;
+            overflow-y: auto;
+            border: none;
+            border-radius: 14px;
+            padding: 18px 12px 18px 12px;
+            background: linear-gradient(120deg, #f6f8fc 60%, #e9eafc 100%);
+            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(60,72,100,0.04);
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            word-break: break-word;
+            white-space: pre-line;
+            margin: 2px 0;
+            display: inline-block;
+            box-sizing: border-box;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(60,72,100,0.06);
+            transition: background 0.2s;
+        }
+        .chat-message.user {
+            align-self: flex-end;
+            color: #2d5fff;
+            background: linear-gradient(120deg, #e0e7ff 60%, #b1c6ff 100%);
+            border-top-right-radius: 0;
+            box-shadow: 0 2px 8px rgba(45,95,255,0.10);
+        }
+        .chat-message.bot {
+            align-self: flex-start;
+            color: #22223b;
+            background: linear-gradient(120deg, #f0f0f0 60%, #e9eafc 100%);
+            border-top-left-radius: 0;
+            box-shadow: 0 2px 8px rgba(60,72,100,0.08);
+        }
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            background: #f6f8fc;
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 0 1px 4px rgba(60,72,100,0.06);
+            transition: box-shadow 0.2s;
+        }
+        .chat-input input:focus {
+            box-shadow: 0 2px 8px rgba(45,95,255,0.12);
+        }
+        .chat-input button {
+            padding: 0 26px;
+            border: none;
+            background: linear-gradient(120deg, #2d5fff 60%, #6c8cff 100%);
+            color: #fff;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(45,95,255,0.10);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .chat-input button:disabled {
+            background: #b1c6ff;
+            color: #fff;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>RAG Chatbot</h2>
+        <div class="chat-log" id="chat-log"></div>
+        <form class="chat-input" id="chat-form">
+            <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" required />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        const chatLog = document.getElementById('chat-log');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+
+        function appendMessage(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-message ' + sender;
+            msgDiv.textContent = text;
+            chatLog.appendChild(msgDiv);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = userInput.value.trim();
+            if (!message) return;
+            appendMessage('user', message);
+            userInput.value = '';
+            // Custom response for 'Hi'
+            if (message.toLowerCase() === 'hi') {
+                appendMessage('bot', 'Hello! How can I help you today?');
+                return;
+            }
+            appendMessage('bot', '...');
+            const botMsgDiv = chatLog.querySelector('.chat-message.bot:last-child');
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    botMsgDiv.textContent = data.response;
+                } else {
+                    botMsgDiv.textContent = 'Error: Unable to get response.';
+                }
+            } catch (err) {
+                botMsgDiv.textContent = 'Error: ' + err.message;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Run FastAPI app (chatbot.py)",
+			"command": "C:/Python313/python.exe -m uvicorn chatbot:app --reload",
+			"args": [],
+			"isBackground": true,
+			"group": "build",
+			"problemMatcher": []
+		}
+	]
+}
