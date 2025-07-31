@@ -29,7 +29,7 @@ llm = ChatOpenAI(
 )
 
 # set up the embedding function for retrieval
-embeddings_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+embeddings_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L6-v2")
 # connect to the chromadb with embedding_function
 vector_store = Chroma(
     collection_name="example_collection",
