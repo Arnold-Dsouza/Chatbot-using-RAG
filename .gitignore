@@ -1,0 +1,17 @@
+# Ignore Python cache and build files
+__pycache__/
+
+
+# Ignore environment and dependency files
+.env
+.env.*
+*.env
+
+
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore other sensitive or large files
+*.log
